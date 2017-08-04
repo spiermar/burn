@@ -30,7 +30,7 @@ var Folded bool
 type Node struct {
 	Name     string
 	Value    int
-	Children map[string]Node
+	Children map[string]*Node
 }
 
 type Profile struct {
@@ -43,12 +43,12 @@ func (n *Node) Add(frames []string, value int) {
 	n.Value += value
 	if len(frames) > 0 {
 		head := frames[0]
-		child, ok := n.Children[head]
+		childPtr, ok := n.Children[head]
 		if !ok {
-			child = Node{head, 0, make(map[string]Node)}
+			childPtr = &(Node{head, 0, make(map[string]*Node)})
+			n.Children[head] = childPtr
 		}
-		child.Add(frames[1:], value)
-		n.Children[head] = child
+		childPtr.Add(frames[1:], value)
 	}
 }
 
@@ -80,7 +80,8 @@ func (p *Profile) AddFrame(name string) {
 }
 
 func Parse(filename string) Profile {
-	profile := Profile{Node{"root", 0, make(map[string]Node)}, []string{}, ""}
+	rootNode := Node{"root", 0, make(map[string]*Node)}
+	profile := Profile{rootNode, []string{}, ""}
 
 	file, err := os.Open(filename)
 	if err != nil {
@@ -127,7 +128,7 @@ func Parse(filename string) Profile {
 func (n *Node) MarshalJSON() ([]byte, error) {
 	v := make([]Node, 0, len(n.Children))
 	for _, value := range n.Children {
-		v = append(v, value)
+		v = append(v, *value)
 	}
 
 	return json.MarshalIndent(&struct {
