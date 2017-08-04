@@ -124,6 +124,23 @@ func Parse(filename string) Profile {
 	return profile
 }
 
+func (n *Node) MarshalJSON() ([]byte, error) {
+	v := make([]Node, 0, len(n.Children))
+	for _, value := range n.Children {
+		v = append(v, value)
+	}
+
+	return json.MarshalIndent(&struct {
+		Name     string `json:"name"`
+		Value    int    `json:"value"`
+		Children []Node `json:"children"`
+	}{
+		Name:     n.Name,
+		Value:    n.Value,
+		Children: v,
+	}, "", "  ")
+}
+
 // convertCmd represents the convert command
 var convertCmd = &cobra.Command{
 	Use:   "convert",
@@ -136,7 +153,7 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		profile := Parse(args[0])
-		b, err := json.MarshalIndent(profile.Samples, "", "  ")
+		b, err := profile.Samples.MarshalJSON()
 		if err != nil {
 			fmt.Println(err)
 			return
