@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
 	"regexp"
@@ -27,40 +28,40 @@ import (
 var Folded bool
 
 type Node struct {
-	name     string
-	value    int
-	children map[string]Node
+	Name     string
+	Value    int
+	Children map[string]Node
 }
 
 type Profile struct {
-	samples Node
-	stack   []string
-	name    string
+	Samples Node
+	Stack   []string
+	Name    string
 }
 
 func (n *Node) Add(frames []string, value int) {
-	n.value += value
+	n.Value += value
 	if len(frames) > 0 {
 		head := frames[0]
-		child, hasChild := n.children[head]
-		if hasChild {
+		child, ok := n.Children[head]
+		if !ok {
 			child = Node{head, 0, make(map[string]Node)}
-			n.children[head] = child
 		}
 		child.Add(frames[1:], value)
+		n.Children[head] = child
 	}
 }
 
 func (p *Profile) OpenStack(name string) {
-	p.stack = []string{}
-	p.name = name
+	p.Stack = []string{}
+	p.Name = name
 }
 
 func (p *Profile) CloseStack() {
-	p.stack = append([]string{p.name}, p.stack...)
-	p.samples.Add(p.stack, 1)
-	p.stack = nil
-	p.name = ""
+	p.Stack = append([]string{p.Name}, p.Stack...)
+	p.Samples.Add(p.Stack, 1)
+	p.Stack = []string{}
+	p.Name = ""
 }
 
 func (p *Profile) AddFrame(name string) {
@@ -74,15 +75,12 @@ func (p *Profile) AddFrame(name string) {
 		if index := strings.Index(name, "("); index != -1 {
 			name = name[:index] // delete everything after '('
 		}
-		p.stack = append([]string{name}, p.stack...)
+		p.Stack = append([]string{name}, p.Stack...)
 	}
 }
 
-func Parse(filename string) string {
-	// n1 := Node{"root", 0, make(map[string]Node)}
-	// n1.Add([]string{}, 5)
-
-	profile := Profile{}
+func Parse(filename string) Profile {
+	profile := Profile{Node{"root", 0, make(map[string]Node)}, []string{}, ""}
 
 	file, err := os.Open(filename)
 	if err != nil {
@@ -123,7 +121,7 @@ func Parse(filename string) string {
 		panic(err)
 	}
 
-	return filename
+	return profile
 }
 
 // convertCmd represents the convert command
@@ -137,7 +135,13 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(Parse("out.perf"))
+		profile := Parse(args[0])
+		b, err := json.MarshalIndent(profile.Samples, "", "  ")
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Println(string(b))
 	},
 }
 
