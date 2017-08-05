@@ -148,13 +148,12 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		profile := Parse(args[0])
-		// b, err := profile.Samples.MarshalJSON()
-		// if err != nil {
-		// 	fmt.Println(err)
-		// 	return
-		// }
-		// fmt.Println(string(b))
-		fmt.Println(profile.Name)
+		b, err := profile.Samples.MarshalJSON()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Println(string(b))
 	},
 }
 
