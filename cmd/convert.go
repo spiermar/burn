@@ -39,16 +39,16 @@ type Profile struct {
 	Name    string
 }
 
-func (n *Node) Add(frames []string, value int) {
+func (n *Node) Add(stackPtr *[]string, index int, value int) {
 	n.Value += value
-	if len(frames) > 0 {
-		head := frames[0]
+	if index >= 0 {
+		head := (*stackPtr)[index]
 		childPtr, ok := n.Children[head]
 		if !ok {
 			childPtr = &(Node{head, 0, make(map[string]*Node)})
 			n.Children[head] = childPtr
 		}
-		childPtr.Add(frames[1:], value)
+		childPtr.Add(stackPtr, index-1, value)
 	}
 }
 
@@ -58,8 +58,8 @@ func (p *Profile) OpenStack(name string) {
 }
 
 func (p *Profile) CloseStack() {
-	p.Stack = append([]string{p.Name}, p.Stack...)
-	p.Samples.Add(p.Stack, 1)
+	p.Stack = append(p.Stack, p.Name)
+	p.Samples.Add(&p.Stack, len(p.Stack)-1, 1)
 	p.Stack = []string{}
 	p.Name = ""
 }
@@ -75,7 +75,7 @@ func (p *Profile) AddFrame(name string) {
 		if index := strings.Index(name, "("); index != -1 {
 			name = name[:index] // delete everything after '('
 		}
-		p.Stack = append([]string{name}, p.Stack...)
+		p.Stack = append(p.Stack, name)
 	}
 }
 
