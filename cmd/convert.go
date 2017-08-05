@@ -18,6 +18,9 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/spiermar/stacko/folded"
+	"github.com/spiermar/stacko/perf"
+	"github.com/spiermar/stacko/types"
 )
 
 var Folded bool
@@ -34,16 +37,16 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		rootNode := stacko.Node{"root", 0, make(map[string]*Node)}
-		profile := stacko.Profile{rootNode, []string{}, ""}
+		rootNode := types.Node{"root", 0, make(map[string]*types.Node)}
+		profile := types.Profile{rootNode, []string{}, ""}
 
 		if Folded {
-			profile = stacko.ParseFolded(args[0])
+			profile = folded.ParseFolded(args[0])
 		} else {
-			profile = stacko.ParsePerf(args[0])
+			profile = perf.ParsePerf(args[0])
 		}
 
-		b, err := profile.Samples.MarshalJSON()
+		b, err := profile.Samples.MarshalJSON(Pretty)
 		if err != nil {
 			fmt.Println(err)
 			return
