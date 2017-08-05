@@ -1,2 +1,2 @@
-# go-stack-convert
-CLI tool to convert perf record stacks to JSON.
+# StackO
+CLI tool to convert stacks to hierarchical data structures.

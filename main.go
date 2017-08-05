@@ -14,7 +14,7 @@
 
 package main
 
-import "github.com/spiermar/go-stack-convert/cmd"
+import "github.com/spiermar/stacko/cmd"
 
 func main() {
 	cmd.Execute()

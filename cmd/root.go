@@ -30,7 +30,7 @@ var cpuProfile string
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
-	Use:   "go-stack-convert",
+	Use:   "stacko",
 	Short: "A brief description of your application",
 	Long: `A longer description that spans multiple lines and likely contains
 examples and usage of using your application. For example:
@@ -74,7 +74,7 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.go-stack-convert.yaml)")
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.stacko.yaml)")
 	RootCmd.PersistentFlags().StringVar(&cpuProfile, "cpuprofile", "", "Write CPU profile to file.")
 
 	// Cobra also supports local flags, which will only run
@@ -95,9 +95,9 @@ func initConfig() {
 			os.Exit(1)
 		}
 
-		// Search config in home directory with name ".go-stack-convert" (without extension).
+		// Search config in home directory with name ".stacko" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".go-stack-convert")
+		viper.SetConfigName(".stacko")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
