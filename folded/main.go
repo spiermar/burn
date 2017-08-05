@@ -17,12 +17,17 @@ package folded
 import (
 	"bufio"
 	"os"
-	"sort"
 	"strconv"
 	"strings"
 
 	"github.com/spiermar/stacko/types"
 )
+
+func reverse(strings []string) {
+	for i, j := 0, len(strings)-1; i < j; i, j = i+1, j-1 {
+		strings[i], strings[j] = strings[j], strings[i]
+	}
+}
 
 func ParseFolded(filename string) types.Profile {
 	rootNode := types.Node{"root", 0, make(map[string]*types.Node)}
@@ -44,7 +49,7 @@ func ParseFolded(filename string) types.Profile {
 		v := line[sep+1:]
 
 		stack := strings.Split(s, ";")
-		sort.Sort(sort.Reverse(sort.StringSlice(stack)))
+		reverse(stack)
 
 		i, err := strconv.Atoi(v)
 		if err != nil {
