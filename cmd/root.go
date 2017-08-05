@@ -16,7 +16,9 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
+	"runtime/pprof"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
@@ -24,6 +26,7 @@ import (
 )
 
 var cfgFile string
+var cpuProfile string
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
@@ -35,9 +38,25 @@ examples and usage of using your application. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		if cpuProfile != "" {
+			f, err := os.Create(cpuProfile)
+			if err != nil {
+				log.Fatal(err)
+			}
+			pprof.StartCPUProfile(f)
+		}
+	},
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	//	Run: func(cmd *cobra.Command, args []string) { },
+	Run: func(cmd *cobra.Command, args []string) {
+		cmd.Usage()
+	},
+	PersistentPostRun: func(cmd *cobra.Command, args []string) {
+		if cpuProfile != "" {
+			pprof.StopCPUProfile()
+		}
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -49,13 +68,14 @@ func Execute() {
 	}
 }
 
-func init() { 
+func init() {
 	cobra.OnInitialize(initConfig)
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.go-stack-convert.yaml)")
+	RootCmd.PersistentFlags().StringVar(&cpuProfile, "cpuprofile", "", "Write CPU profile to file.")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
