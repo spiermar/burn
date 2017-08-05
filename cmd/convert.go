@@ -94,26 +94,20 @@ func Parse(filename string) Profile {
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		var rComment = regexp.MustCompile(`^#`)                                    // Comment line
-		var rEventRecordStart = regexp.MustCompile(`^(\S.+?)\s+(\d+)\/*(\d+)*\s+`) // Event record start
-		var rStackLine = regexp.MustCompile(`^\s*(\w+)\s*(.+) \((\S*)\)`)          // Stack line
-		var rEndStack = regexp.MustCompile(`^$`)                                   // End of stack
+		var reCommentLine = regexp.MustCompile(`^#`)                                    // Comment line
+		var reEventRecordStartLine = regexp.MustCompile(`^(\S.+?)\s+(\d+)\/*(\d+)*\s+`) // Event record start
+		var reStackLine = regexp.MustCompile(`^\s*(\w+)\s*(.+) \((\S*)\)`)              // Stack line
+		var reEndStackLine = regexp.MustCompile(`^$`)                                   // End of stack
 
-		switch {
-		case rComment.MatchString(line):
-			break
-		case rEventRecordStart.MatchString(line):
-			matches := rEventRecordStart.FindStringSubmatch(line)
+		if reCommentLine.MatchString(line) {
+			// Do nothing
+		} else if matches := reEventRecordStartLine.FindStringSubmatch(line); matches != nil {
 			profile.OpenStack(matches[1])
-			break
-		case rStackLine.MatchString(line):
-			matches := rStackLine.FindStringSubmatch(line)
+		} else if matches := reStackLine.FindStringSubmatch(line); matches != nil {
 			profile.AddFrame(matches[2])
-			break
-		case rEndStack.MatchString(line):
+		} else if reEndStackLine.MatchString(line) {
 			profile.CloseStack()
-			break
-		default:
+		} else {
 			panic("Don't know what to do with this line.")
 		}
 	}
@@ -154,12 +148,13 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		profile := Parse(args[0])
-		b, err := profile.Samples.MarshalJSON()
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		fmt.Println(string(b))
+		// b, err := profile.Samples.MarshalJSON()
+		// if err != nil {
+		// 	fmt.Println(err)
+		// 	return
+		// }
+		// fmt.Println(string(b))
+		fmt.Println(profile.Name)
 	},
 }
 
