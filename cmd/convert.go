@@ -28,6 +28,7 @@ import (
 )
 
 var Folded bool
+var Pretty bool
 
 type Node struct {
 	Name     string
@@ -165,7 +166,19 @@ func (n *Node) MarshalJSON() ([]byte, error) {
 		v = append(v, *value)
 	}
 
-	return json.MarshalIndent(&struct {
+	if Pretty {
+		return json.MarshalIndent(&struct {
+			Name     string `json:"name"`
+			Value    int    `json:"value"`
+			Children []Node `json:"children"`
+		}{
+			Name:     n.Name,
+			Value:    n.Value,
+			Children: v,
+		}, "", "  ")
+	}
+
+	return json.Marshal(&struct {
 		Name     string `json:"name"`
 		Value    int    `json:"value"`
 		Children []Node `json:"children"`
@@ -173,7 +186,7 @@ func (n *Node) MarshalJSON() ([]byte, error) {
 		Name:     n.Name,
 		Value:    n.Value,
 		Children: v,
-	}, "", "  ")
+	})
 }
 
 // convertCmd represents the convert command
@@ -214,6 +227,7 @@ func init() {
 	// and all subcommands, e.g.:
 	// convertCmd.PersistentFlags().String("foo", "", "A help for foo")
 	RootCmd.PersistentFlags().BoolVarP(&Folded, "folded", "f", false, "Input is a folded stack.")
+	RootCmd.PersistentFlags().BoolVarP(&Pretty, "pretty", "p", false, "JSON output is pretty printed.")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
