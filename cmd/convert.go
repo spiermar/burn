@@ -20,6 +20,8 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -95,9 +97,9 @@ func Parse(filename string) Profile {
 		line := scanner.Text()
 
 		var reCommentLine = regexp.MustCompile(`^#`)                                    // Comment line
-		var reEventRecordStartLine = regexp.MustCompile(`^(\S.+?)\s+(\d+)\/*(\d+)*\s+`) // Event record start
+		var reEventRecordStartLine = regexp.MustCompile(`^(\S.+?)\s+(\d+)\/*(\d+)*\s+`) // Event record start line
 		var reStackLine = regexp.MustCompile(`^\s*(\w+)\s*(.+) \((\S*)\)`)              // Stack line
-		var reEndStackLine = regexp.MustCompile(`^$`)                                   // End of stack
+		var reEndStackLine = regexp.MustCompile(`^$`)                                   // End of stack line
 
 		if reCommentLine.MatchString(line) {
 			// Do nothing
@@ -115,6 +117,44 @@ func Parse(filename string) Profile {
 	if err := scanner.Err(); err != nil {
 		panic(err)
 	}
+
+	return profile
+}
+
+func ParseFolded(filename string) Profile {
+	rootNode := Node{"root", 0, make(map[string]*Node)}
+
+	file, err := os.Open(filename)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+
+		sep := strings.LastIndex(line, " ")
+
+		s := line[:sep]
+		v := line[sep+1:]
+
+		stack := strings.Split(s, ";")
+		sort.Sort(sort.Reverse(sort.StringSlice(stack)))
+
+		i, err := strconv.Atoi(v)
+		if err != nil {
+			panic(err)
+		}
+		rootNode.Add(&stack, len(stack)-1, i)
+	}
+
+	if err := scanner.Err(); err != nil {
+
+	}
+
+	profile := Profile{rootNode, []string{}, ""}
 
 	return profile
 }
@@ -147,7 +187,15 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		profile := Parse(args[0])
+		rootNode := Node{"root", 0, make(map[string]*Node)}
+		profile := Profile{rootNode, []string{}, ""}
+
+		if Folded {
+			profile = ParseFolded(args[0])
+		} else {
+			profile = Parse(args[0])
+		}
+
 		b, err := profile.Samples.MarshalJSON()
 		if err != nil {
 			fmt.Println(err)
