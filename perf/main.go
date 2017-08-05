@@ -19,6 +19,7 @@ import (
 	"os"
 	"regexp"
 
+	"github.com/looplab/fsm"
 	"github.com/spiermar/stacko/types"
 )
 
@@ -34,24 +35,106 @@ func ParsePerf(filename string) types.Profile {
 
 	scanner := bufio.NewScanner(file)
 
+	state := fsm.NewFSM(
+		"start",
+		fsm.Events{
+			{Name: "read_comment", Src: []string{"start"}, Dst: "comment"},
+			{Name: "open_stack", Src: []string{"start"}, Dst: "event"},
+			{Name: "open_stack", Src: []string{"comment"}, Dst: "event"},
+			{Name: "read_stack", Src: []string{"event"}, Dst: "open"},
+			{Name: "close_stack", Src: []string{"open"}, Dst: "closed"},
+			{Name: "open_stack", Src: []string{"closed"}, Dst: "event"},
+			{Name: "finish", Src: []string{"closed"}, Dst: "end"},
+		},
+		fsm.Callbacks{
+			"enter_event": func(e *fsm.Event) {
+
+			},
+			"enter_open": func(e *fsm.Event) {
+
+			},
+			"enter_closed": func(e *fsm.Event) {
+
+			},
+		},
+	)
+
+	reCommentLine := regexp.MustCompile(`^#`)                                    // Comment line
+	reEventRecordStartLine := regexp.MustCompile(`^(\S.+?)\s+(\d+)\/*(\d+)*\s+`) // Event record start line
+	reStackLine := regexp.MustCompile(`^\s*(\w+)\s*(.+) \((\S*)\)`)              // Stack line
+	reEndStackLine := regexp.MustCompile(`^$`)                                   // End of stack line
+
 	for scanner.Scan() {
 		line := scanner.Text()
+		current := state.Current()
 
-		var reCommentLine = regexp.MustCompile(`^#`)                                    // Comment line
-		var reEventRecordStartLine = regexp.MustCompile(`^(\S.+?)\s+(\d+)\/*(\d+)*\s+`) // Event record start line
-		var reStackLine = regexp.MustCompile(`^\s*(\w+)\s*(.+) \((\S*)\)`)              // Stack line
-		var reEndStackLine = regexp.MustCompile(`^$`)                                   // End of stack line
-
-		if reCommentLine.MatchString(line) {
-			// Do nothing
-		} else if matches := reEventRecordStartLine.FindStringSubmatch(line); matches != nil {
-			profile.OpenStack(matches[1])
-		} else if matches := reStackLine.FindStringSubmatch(line); matches != nil {
-			profile.AddFrame(matches[2])
-		} else if reEndStackLine.MatchString(line) {
-			profile.CloseStack()
-		} else {
-			panic("Don't know what to do with this line.")
+		switch current {
+		case "start":
+			if reCommentLine.MatchString(line) {
+				err := state.Event("read_comment")
+				if err != nil {
+					panic(err)
+				}
+			} else if matches := reEventRecordStartLine.FindStringSubmatch(line); matches != nil {
+				err := state.Event("open_stack")
+				if err != nil {
+					panic(err)
+				}
+				profile.OpenStack(matches[1])
+			} else {
+				panic("Invalid format.")
+			}
+		case "comment":
+			if reCommentLine.MatchString(line) {
+				// Do nothing
+			} else if matches := reEventRecordStartLine.FindStringSubmatch(line); matches != nil {
+				err := state.Event("open_stack")
+				if err != nil {
+					panic(err)
+				}
+				profile.OpenStack(matches[1])
+			} else {
+				panic("Invalid format.")
+			}
+		case "event":
+			if matches := reStackLine.FindStringSubmatch(line); matches != nil {
+				err := state.Event("read_stack")
+				if err != nil {
+					panic(err)
+				}
+				profile.AddFrame(matches[2])
+			} else {
+				panic("Invalid format.")
+			}
+		case "open":
+			if matches := reStackLine.FindStringSubmatch(line); matches != nil {
+				profile.AddFrame(matches[2])
+			} else if reEndStackLine.MatchString(line) {
+				err := state.Event("close_stack")
+				if err != nil {
+					panic(err)
+				}
+				profile.CloseStack()
+			} else {
+				panic("Invalid format.")
+			}
+		case "closed":
+			if matches := reEventRecordStartLine.FindStringSubmatch(line); matches != nil {
+				err := state.Event("open_stack")
+				if err != nil {
+					panic(err)
+				}
+				profile.OpenStack(matches[1])
+			} else {
+				err := state.Event("finish")
+				if err != nil {
+					panic(err)
+				}
+			}
+		case "end":
+			break
+		default:
+			panic("Invalid state.")
 		}
 	}
 
