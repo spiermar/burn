@@ -20,21 +20,17 @@ import (
 )
 
 type Profile struct {
-	Samples Node
-	Stack   []string
-	Name    string
+	RootNode Node
+	Stack    []string
 }
 
-func (p *Profile) OpenStack(name string) {
+func (p *Profile) OpenStack() {
 	p.Stack = []string{}
-	p.Name = name
 }
 
 func (p *Profile) CloseStack() {
-	p.Stack = append(p.Stack, p.Name)
-	p.Samples.Add(&p.Stack, len(p.Stack)-1, 1)
+	p.RootNode.Add(&p.Stack, len(p.Stack)-1, 1)
 	p.Stack = []string{}
-	p.Name = ""
 }
 
 func (p *Profile) AddFrame(name string) {

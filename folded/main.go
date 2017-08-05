@@ -62,7 +62,7 @@ func ParseFolded(filename string) types.Profile {
 
 	}
 
-	profile := types.Profile{rootNode, []string{}, ""}
+	profile := types.Profile{rootNode, []string{}}
 
 	return profile
 }

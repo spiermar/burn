@@ -25,7 +25,7 @@ import (
 
 func ParsePerf(filename string) types.Profile {
 	rootNode := types.Node{"root", 0, make(map[string]*types.Node)}
-	profile := types.Profile{rootNode, []string{}, ""}
+	profile := types.Profile{rootNode, []string{}}
 
 	file, err := os.Open(filename)
 	if err != nil {
@@ -80,7 +80,8 @@ func ParsePerf(filename string) types.Profile {
 				if err != nil {
 					panic(err)
 				}
-				profile.OpenStack(matches[1])
+				profile.OpenStack()
+				profile.AddFrame(matches[1])
 			} else {
 				panic("Invalid format.")
 			}
@@ -92,7 +93,8 @@ func ParsePerf(filename string) types.Profile {
 				if err != nil {
 					panic(err)
 				}
-				profile.OpenStack(matches[1])
+				profile.OpenStack()
+				profile.AddFrame(matches[1])
 			} else {
 				panic("Invalid format.")
 			}
@@ -124,7 +126,8 @@ func ParsePerf(filename string) types.Profile {
 				if err != nil {
 					panic(err)
 				}
-				profile.OpenStack(matches[1])
+				profile.OpenStack()
+				profile.AddFrame(matches[1])
 			} else {
 				err := state.Event("finish")
 				if err != nil {

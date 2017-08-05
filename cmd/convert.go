@@ -38,7 +38,7 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		rootNode := types.Node{"root", 0, make(map[string]*types.Node)}
-		profile := types.Profile{rootNode, []string{}, ""}
+		profile := types.Profile{rootNode, []string{}}
 
 		if Folded {
 			profile = folded.ParseFolded(args[0])
@@ -47,14 +47,14 @@ to quickly create a Cobra application.`,
 		}
 
 		if Pretty {
-			b, err := profile.Samples.MarshalIndentJSON()
+			b, err := profile.RootNode.MarshalIndentJSON()
 			if err != nil {
 				fmt.Println(err)
 				return
 			}
 			fmt.Println(string(b))
 		} else {
-			b, err := profile.Samples.MarshalJSON()
+			b, err := profile.RootNode.MarshalJSON()
 			if err != nil {
 				fmt.Println(err)
 				return
