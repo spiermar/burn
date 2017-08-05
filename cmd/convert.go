@@ -46,12 +46,21 @@ to quickly create a Cobra application.`,
 			profile = perf.ParsePerf(args[0])
 		}
 
-		b, err := profile.Samples.MarshalJSON(Pretty)
-		if err != nil {
-			fmt.Println(err)
-			return
+		if Pretty {
+			b, err := profile.Samples.MarshalIndentJSON()
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			fmt.Println(string(b))
+		} else {
+			b, err := profile.Samples.MarshalJSON()
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			fmt.Println(string(b))
 		}
-		fmt.Println(string(b))
 	},
 }
 

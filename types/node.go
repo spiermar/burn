@@ -35,22 +35,10 @@ func (n *Node) Add(stackPtr *[]string, index int, value int) {
 	}
 }
 
-func (n *Node) MarshalJSON(pretty bool) ([]byte, error) {
+func (n *Node) MarshalJSON() ([]byte, error) {
 	v := make([]Node, 0, len(n.Children))
 	for _, value := range n.Children {
 		v = append(v, *value)
-	}
-
-	if pretty {
-		return json.MarshalIndent(&struct {
-			Name     string `json:"name"`
-			Value    int    `json:"value"`
-			Children []Node `json:"children"`
-		}{
-			Name:     n.Name,
-			Value:    n.Value,
-			Children: v,
-		}, "", "  ")
 	}
 
 	return json.Marshal(&struct {
@@ -62,4 +50,21 @@ func (n *Node) MarshalJSON(pretty bool) ([]byte, error) {
 		Value:    n.Value,
 		Children: v,
 	})
+}
+
+func (n *Node) MarshalIndentJSON() ([]byte, error) {
+	v := make([]Node, 0, len(n.Children))
+	for _, value := range n.Children {
+		v = append(v, *value)
+	}
+
+	return json.MarshalIndent(&struct {
+		Name     string `json:"name"`
+		Value    int    `json:"value"`
+		Children []Node `json:"children"`
+	}{
+		Name:     n.Name,
+		Value:    n.Value,
+		Children: v,
+	}, "", "  ")
 }
