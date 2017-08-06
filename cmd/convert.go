@@ -23,8 +23,7 @@ import (
 	"github.com/spiermar/stacko/types"
 )
 
-var Folded bool
-var Pretty bool
+var pretty bool
 
 // convertCmd represents the convert command
 var convertCmd = &cobra.Command{
@@ -40,24 +39,22 @@ to quickly create a Cobra application.`,
 		rootNode := types.Node{"root", 0, make(map[string]*types.Node)}
 		profile := types.Profile{rootNode, []string{}}
 
-		if Folded {
+		if foldedStack {
 			profile = folded.ParseFolded(args[0])
 		} else {
 			profile = perf.ParsePerf(args[0])
 		}
 
-		if Pretty {
+		if pretty {
 			b, err := profile.RootNode.MarshalIndentJSON()
 			if err != nil {
-				fmt.Println(err)
-				return
+				panic(err)
 			}
 			fmt.Println(string(b))
 		} else {
 			b, err := profile.RootNode.MarshalJSON()
 			if err != nil {
-				fmt.Println(err)
-				return
+				panic(err)
 			}
 			fmt.Println(string(b))
 		}
@@ -72,8 +69,8 @@ func init() {
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	// convertCmd.PersistentFlags().String("foo", "", "A help for foo")
-	RootCmd.PersistentFlags().BoolVarP(&Folded, "folded", "f", false, "Input is a folded stack.")
-	RootCmd.PersistentFlags().BoolVarP(&Pretty, "pretty", "p", false, "JSON output is pretty printed.")
+	convertCmd.PersistentFlags().BoolVarP(&foldedStack, "folded", "f", false, "Input is a folded stack.")
+	convertCmd.PersistentFlags().BoolVarP(&pretty, "pretty", "p", false, "JSON output is pretty printed.")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:

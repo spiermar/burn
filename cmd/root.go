@@ -27,6 +27,7 @@ import (
 
 var cfgFile string
 var cpuProfile string
+var foldedStack bool
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
