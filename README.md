@@ -15,17 +15,17 @@ Input and Output examples can be found in the [examples](/examples) directory.
 
 ## Issues
 
-For bugs, questions and discussions please use the [GitHub Issues](/issues).
+For bugs, questions and discussions please use the [GitHub Issues](https://github.com/spiermar/stacko/issues).
 
 ## Contributing
 
 We love contributions! But in order to avoid total chaos, we have a few guidelines.
 
-If you found a bug, have questions or feature requests, don't hesitate to open an [issue](/issues).
+If you found a bug, have questions or feature requests, don't hesitate to open an [issue](https://github.com/spiermar/stacko/issues).
 
 If you're working on an issue, please comment on it so we can assign you to it.
 
-If you have code to submit, follow the general pull request format. Fork the repo, make your changes, and submit a [pull request](/pulls).
+If you have code to submit, follow the general pull request format. Fork the repo, make your changes, and submit a [pull request](https://github.com/spiermar/stacko/pulls).
 
 ## License
 
