@@ -23,14 +23,16 @@ Binaries are being provided for both `linux` and `darwin`, in `amd64` arch.
 #### darwin/amd64
 
 ```bash
-$ curl -L "https://dl.bintray.com/mspier/burn/darwin/amd64/burn" -o burn
+$ curl -L "https://dl.bintray.com/mspier/binaries/darwin/amd64/burn" -o burn
+$ chmod +x burn
 $ ./burn <perf_output_file>
 ```
 
 #### linux/amd64
 
 ```bash
-$ curl -L "https://dl.bintray.com/mspier/burn/linux/amd64/burn" -o burn
+$ curl -L "https://dl.bintray.com/mspier/binaries/linux/amd64/burn" -o burn
+$ chmod +x burn
 $ ./burn <perf_output_file>
 ```
 
