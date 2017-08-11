@@ -11,7 +11,7 @@ Make sure you have [golang](https://golang.org/) installed and `GOPATH` correctl
 
 ```bash
 $ go get github.com/spiermar/stacko
-$ ./stacko $GOPATH/src/github.com/spiermar/stacko/examples/out.perf
+$ stacko $GOPATH/src/github.com/spiermar/stacko/examples/out.perf
 ```
 
 ### From binary
