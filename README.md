@@ -25,7 +25,7 @@ Binaries are being provided for both `linux` and `darwin`, in `amd64` arch.
 ```bash
 $ curl -L "https://dl.bintray.com/mspier/binaries/darwin/amd64/burn" -o burn
 $ chmod +x burn
-$ ./burn <perf_output_file>
+$ ./burn <input_file>
 ```
 
 #### linux/amd64
@@ -33,7 +33,7 @@ $ ./burn <perf_output_file>
 ```bash
 $ curl -L "https://dl.bintray.com/mspier/binaries/linux/amd64/burn" -o burn
 $ chmod +x burn
-$ ./burn <perf_output_file>
+$ ./burn <input_file>
 ```
 
 ## Options
@@ -49,9 +49,10 @@ Examples:
   burn convert --html examples/out.perf
   burn convert --output=flame.json examples/out.perf
   burn convert --html --output=flame.html examples/out.perf
+  perf script | burn convert --html
 
 Usage:
-  burn convert [flags] <input>
+  burn convert [flags] (<input>)
 
 Flags:
   -f, --folded          input is a folded stack

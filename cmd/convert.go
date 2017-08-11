@@ -25,9 +25,9 @@ import (
 )
 
 var pretty bool
-var folded bool
 var html bool
 var output string
+var input string
 
 // convertCmd represents the convert command
 var convertCmd = &cobra.Command{
@@ -38,7 +38,7 @@ Convert performance profiles to a hierarchical data structure.
 
 Examples:
   burn convert examples/out.perf
-  burn convert --folded examples/out.perf-folded
+  burn convert --type=folded examples/out.perf-folded
   burn convert --html examples/out.perf
   burn convert --output=flame.json examples/out.perf
   burn convert --html --output=flame.html examples/out.perf
@@ -73,10 +73,12 @@ Examples:
 		rootNode := types.Node{Name: "root", Value: 0, Children: make(map[string]*types.Node)}
 		profile := types.Profile{RootNode: rootNode, Stack: []string{}}
 
-		if folded {
+		if input == "folded" {
 			profile = convert.ParseFolded(file)
-		} else {
+		} else if input == "perf" {
 			profile = convert.ParsePerf(file)
+		} else {
+			panic("input type not supported: " + input)
 		}
 
 		b := []byte{}
@@ -129,10 +131,10 @@ func init() {
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	// convertCmd.PersistentFlags().String("foo", "", "A help for foo")
-	convertCmd.PersistentFlags().BoolVarP(&folded, "folded", "f", false, "input is a folded stack")
 	convertCmd.PersistentFlags().BoolVarP(&pretty, "pretty", "p", false, "json output is pretty printed")
 	convertCmd.PersistentFlags().BoolVarP(&html, "html", "m", false, "output is a html flame graph")
 	convertCmd.PersistentFlags().StringVar(&output, "output", "", "output file")
+	convertCmd.PersistentFlags().StringVar(&input, "type", "perf", "input type")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
