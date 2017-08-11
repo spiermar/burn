@@ -3,15 +3,97 @@ StackO is a CLI tool to convert performance profiles (perf, etc) to a JSON hiera
 
 ## Getting Started
 
+Just download _StackO_ from the _golang_ source or binary and use it!
+
 ### From go
+
+Make sure you have [golang](https://golang.org/) installed and `GOPATH` correctly set.
+
+```bash
+$ go get github.com/spiermar/stacko
+$ ./stacko $GOPATH/src/github.com/spiermar/stacko/examples/out.perf
+```
 
 ### From binary
 
+Binaries are being provided for both `linux` and `darwin`, in `amd64` arch.
+
+#### darwin/amd64
+
+```bash
+$ curl -L "https://dl.bintray.com/mspier/stacko/darwin/amd64/stacko" -o stacko
+$ ./stacko <perf_output_file>
+```
+
+#### linux/amd64
+
+```bash
+$ curl -L "https://dl.bintray.com/mspier/stacko/linux/amd64/stacko" -o stacko
+$ ./stacko <perf_output_file>
+```
+
 ## Options
+
+```
+$ stacko convert --help
+
+Convert a performance profile to a JSON.
+
+Examples:
+  stacko convert examples/out.perf
+  stacko convert --folded examples/out.perf-folded
+
+Usage:
+  stacko convert [flags] <input>
+
+Flags:
+  -f, --folded   input is a folded stack
+  -h, --help     help for convert
+  -p, --pretty   json output is pretty printed
+
+Global Flags:
+      --config string       config file (default is $HOME/.stacko.yaml)
+      --cpuprofile string   write CPU profile to file
+      --memprofile string   write heap profile to fil
+```
+
+```
+$ stacko html --help
+
+Convert a performance profile to HTML flame graph.
+
+Examples:
+  stacko html examples/out.perf
+  stacko html --folded --output=flame.html examples/out.perf-folded
+
+Usage:
+  stacko html [flags] <input>
+
+Flags:
+  -f, --folded          input is a folded stack
+  -h, --help            help for html
+      --output string   output file
+
+Global Flags:
+      --config string       config file (default is $HOME/.stacko.yaml)
+      --cpuprofile string   write CPU profile to file
+      --memprofile string   write heap profile to file
+```
 
 ## Examples
 
-Input and Output examples can be found in the [examples](/examples) directory.
+Input and output examples can be found in the [examples](/examples) directory.
+
+## Building from Source
+
+Make sure you have [golang](https://golang.org/) installed and `GOPATH` correctly set.
+
+```bash
+$ go get github.com/spiermar/stacko
+$ cd $GOPATH/src/github.com/spiermar/stacko
+$ go build
+$ ./stacko examples/out.perf
+```
 
 ## Issues
 

@@ -18,8 +18,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/spiermar/stacko/folded"
-	"github.com/spiermar/stacko/perf"
+	"github.com/spiermar/stacko/convert"
 	"github.com/spiermar/stacko/types"
 )
 
@@ -27,22 +26,23 @@ var pretty bool
 
 // convertCmd represents the convert command
 var convertCmd = &cobra.Command{
-	Use:   "convert",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Use:   "convert [flags] <input>",
+	Short: "Convert a performance profile to a JSON",
+	Long: `
+Convert a performance profile to a JSON.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+Examples:
+  stacko convert examples/out.perf
+  stacko convert --folded examples/out.perf-folded
+	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		rootNode := types.Node{"root", 0, make(map[string]*types.Node)}
 		profile := types.Profile{rootNode, []string{}}
 
 		if foldedStack {
-			profile = folded.ParseFolded(args[0])
+			profile = convert.ParseFolded(args[0])
 		} else {
-			profile = perf.ParsePerf(args[0])
+			profile = convert.ParsePerf(args[0])
 		}
 
 		if pretty {
@@ -69,8 +69,8 @@ func init() {
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	// convertCmd.PersistentFlags().String("foo", "", "A help for foo")
-	convertCmd.PersistentFlags().BoolVarP(&foldedStack, "folded", "f", false, "Input is a folded stack.")
-	convertCmd.PersistentFlags().BoolVarP(&pretty, "pretty", "p", false, "JSON output is pretty printed.")
+	convertCmd.PersistentFlags().BoolVarP(&foldedStack, "folded", "f", false, "input is a folded stack")
+	convertCmd.PersistentFlags().BoolVarP(&pretty, "pretty", "p", false, "json output is pretty printed")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:

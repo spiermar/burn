@@ -32,14 +32,19 @@ var foldedStack bool
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
-	Use:   "stacko",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Use:   "stacko command [flags] <input>",
+	Short: "A tool to convert performance profiles to a JSON",
+	Long: `
+StackO is a CLI tool to convert performance profiles to a JSON hierarchical
+data structures that can be consumed by the d3-flame-graph plugin.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+StackO can also generate a fully contained HTML flame graph from the same data.
+
+Examples:
+  stacko convert examples/out.perf
+  stacko convert --folded examples/out.perf-folded
+  stacko html examples/out.perf
+	`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		if cpuProfile != "" {
 			f, err := os.Create(cpuProfile)
@@ -85,12 +90,12 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.stacko.yaml)")
-	RootCmd.PersistentFlags().StringVar(&cpuProfile, "cpuprofile", "", "Write CPU profile to file.")
-	RootCmd.PersistentFlags().StringVar(&memProfile, "memprofile", "", "Write heap profile to file.")
+	RootCmd.PersistentFlags().StringVar(&cpuProfile, "cpuprofile", "", "write CPU profile to file")
+	RootCmd.PersistentFlags().StringVar(&memProfile, "memprofile", "", "write heap profile to file")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 // initConfig reads in config file and ENV variables if set.

@@ -20,8 +20,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/spiermar/stacko/folded"
-	"github.com/spiermar/stacko/perf"
+	"github.com/spiermar/stacko/convert"
 	"github.com/spiermar/stacko/types"
 )
 
@@ -165,14 +164,15 @@ const tpl = `<!DOCTYPE html>
 
 // htmlCmd represents the html command
 var htmlCmd = &cobra.Command{
-	Use:   "html",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Use:   "html [flags] <input>",
+	Short: "Convert a performance profile to HTML flame graph",
+	Long: `
+Convert a performance profile to HTML flame graph.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+Examples:
+  stacko html examples/out.perf
+  stacko html --folded --output=flame.html examples/out.perf-folded
+  `,
 	Run: func(cmd *cobra.Command, args []string) {
 		filename := string(args[0])
 
@@ -180,9 +180,9 @@ to quickly create a Cobra application.`,
 		profile := types.Profile{rootNode, []string{}}
 
 		if foldedStack {
-			profile = folded.ParseFolded(filename)
+			profile = convert.ParseFolded(filename)
 		} else {
-			profile = perf.ParsePerf(filename)
+			profile = convert.ParsePerf(filename)
 		}
 
 		b, err := profile.RootNode.MarshalJSON()
@@ -233,8 +233,8 @@ func init() {
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	// htmlCmd.PersistentFlags().String("foo", "", "A help for foo")
-	htmlCmd.PersistentFlags().BoolVarP(&foldedStack, "folded", "f", false, "Input is a folded stack.")
-	htmlCmd.PersistentFlags().StringVar(&output, "output", "", "Output file.")
+	htmlCmd.PersistentFlags().BoolVarP(&foldedStack, "folded", "f", false, "input is a folded stack")
+	htmlCmd.PersistentFlags().StringVar(&output, "output", "", "output file")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
