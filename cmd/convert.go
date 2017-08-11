@@ -18,8 +18,8 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/spiermar/stacko/convert"
-	"github.com/spiermar/stacko/types"
+	"github.com/spiermar/burn/convert"
+	"github.com/spiermar/burn/types"
 )
 
 var pretty bool
@@ -32,8 +32,8 @@ var convertCmd = &cobra.Command{
 Convert a performance profile to a JSON.
 
 Examples:
-  stacko convert examples/out.perf
-  stacko convert --folded examples/out.perf-folded
+  burn convert examples/out.perf
+  burn convert --folded examples/out.perf-folded
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		rootNode := types.Node{"root", 0, make(map[string]*types.Node)}

@@ -14,7 +14,7 @@
 
 package main
 
-import "github.com/spiermar/stacko/cmd"
+import "github.com/spiermar/burn/cmd"
 
 func main() {
 	cmd.Execute()

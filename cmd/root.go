@@ -32,18 +32,18 @@ var foldedStack bool
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
-	Use:   "stacko command [flags] <input>",
+	Use:   "burn command [flags] <input>",
 	Short: "A tool to convert performance profiles to a JSON",
 	Long: `
-StackO is a CLI tool to convert performance profiles to a JSON hierarchical
+burn is a CLI tool to convert performance profiles to a JSON hierarchical
 data structures that can be consumed by the d3-flame-graph plugin.
 
-StackO can also generate a fully contained HTML flame graph from the same data.
+burn can also generate a fully contained HTML flame graph from the same data.
 
 Examples:
-  stacko convert examples/out.perf
-  stacko convert --folded examples/out.perf-folded
-  stacko html examples/out.perf
+  burn convert examples/out.perf
+  burn convert --folded examples/out.perf-folded
+  burn html examples/out.perf
 	`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		if cpuProfile != "" {
@@ -89,7 +89,7 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.stacko.yaml)")
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.burn.yaml)")
 	RootCmd.PersistentFlags().StringVar(&cpuProfile, "cpuprofile", "", "write CPU profile to file")
 	RootCmd.PersistentFlags().StringVar(&memProfile, "memprofile", "", "write heap profile to file")
 
@@ -111,9 +111,9 @@ func initConfig() {
 			os.Exit(1)
 		}
 
-		// Search config in home directory with name ".stacko" (without extension).
+		// Search config in home directory with name ".burn" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".stacko")
+		viper.SetConfigName(".burn")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match

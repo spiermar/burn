@@ -20,8 +20,8 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/spiermar/stacko/convert"
-	"github.com/spiermar/stacko/types"
+	"github.com/spiermar/burn/convert"
+	"github.com/spiermar/burn/types"
 )
 
 var output string
@@ -170,8 +170,8 @@ var htmlCmd = &cobra.Command{
 Convert a performance profile to HTML flame graph.
 
 Examples:
-  stacko html examples/out.perf
-  stacko html --folded --output=flame.html examples/out.perf-folded
+  burn html examples/out.perf
+  burn html --folded --output=flame.html examples/out.perf-folded
   `,
 	Run: func(cmd *cobra.Command, args []string) {
 		filename := string(args[0])

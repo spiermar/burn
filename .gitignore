@@ -3,7 +3,7 @@
 *.dll
 *.so
 *.dylib
-stacko
+burn
 
 # Test binary, build with `go test -c`
 *.test

@@ -20,7 +20,7 @@ import (
 	"regexp"
 
 	"github.com/looplab/fsm"
-	"github.com/spiermar/stacko/types"
+	"github.com/spiermar/burn/types"
 )
 
 func ParsePerf(filename string) types.Profile {
