@@ -31,7 +31,7 @@ var output string
 
 // convertCmd represents the convert command
 var convertCmd = &cobra.Command{
-	Use:   "convert [flags] <input>",
+	Use:   "convert [flags] (<input>)",
 	Short: "Convert performance profiles to a hierarchical data structure",
 	Long: `
 Convert performance profiles to a hierarchical data structure.
@@ -44,15 +44,39 @@ Examples:
   burn convert --html --output=flame.html examples/out.perf
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
-		filePath := string(args[0])
+		file := (*os.File)(nil)
+		path := ""
 
-		rootNode := types.Node{"root", 0, make(map[string]*types.Node)}
-		profile := types.Profile{rootNode, []string{}}
+		if len(args) > 0 {
+			path := string(args[0])
+			err := (error)(nil)
+			file, err = os.Open(path)
+			if err != nil {
+				panic(err)
+			}
+			defer file.Close()
+		} else {
+			stdinFileInfo, err := os.Stdin.Stat()
+			if err != nil {
+				panic(err)
+			}
+			stdinFileMode := stdinFileInfo.Mode()
+			if (stdinFileMode & os.ModeNamedPipe) != 0 {
+				file = os.Stdin
+			}
+		}
+
+		if file == nil {
+			panic("no input")
+		}
+
+		rootNode := types.Node{Name: "root", Value: 0, Children: make(map[string]*types.Node)}
+		profile := types.Profile{RootNode: rootNode, Stack: []string{}}
 
 		if folded {
-			profile = convert.ParseFolded(filePath)
+			profile = convert.ParseFolded(file)
 		} else {
-			profile = convert.ParsePerf(filePath)
+			profile = convert.ParsePerf(file)
 		}
 
 		b := []byte{}
@@ -83,8 +107,11 @@ Examples:
 		}
 
 		if html {
-			sep := strings.LastIndex(filePath, "/")
-			filename := filePath[sep+1:]
+			if path == "" {
+				path = "unknown"
+			}
+			sep := strings.LastIndex(path, "/")
+			filename := path[sep+1:]
 			convert.GenerateHtml(wr, filename, string(b))
 		} else {
 			fmt.Fprintln(wr, string(b))

@@ -16,7 +16,7 @@ package convert
 
 import (
 	"bufio"
-	"os"
+	"io"
 	"strconv"
 	"strings"
 
@@ -29,16 +29,11 @@ func reverse(strings []string) {
 	}
 }
 
-func ParseFolded(filename string) types.Profile {
-	rootNode := types.Node{"root", 0, make(map[string]*types.Node)}
+// ParseFolded parses a folded stack file format.
+func ParseFolded(r io.Reader) types.Profile {
+	rootNode := types.Node{Name: "root", Value: 0, Children: make(map[string]*types.Node)}
 
-	file, err := os.Open(filename)
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(r)
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -62,7 +57,7 @@ func ParseFolded(filename string) types.Profile {
 
 	}
 
-	profile := types.Profile{rootNode, []string{}}
+	profile := types.Profile{RootNode: rootNode, Stack: []string{}}
 
 	return profile
 }

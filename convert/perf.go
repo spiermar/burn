@@ -16,24 +16,19 @@ package convert
 
 import (
 	"bufio"
-	"os"
+	"io"
 	"regexp"
 
 	"github.com/looplab/fsm"
 	"github.com/spiermar/burn/types"
 )
 
-func ParsePerf(filename string) types.Profile {
-	rootNode := types.Node{"root", 0, make(map[string]*types.Node)}
-	profile := types.Profile{rootNode, []string{}}
+// ParsePerf parses a perf_events file format.
+func ParsePerf(r io.Reader) types.Profile {
+	rootNode := types.Node{Name: "root", Value: 0, Children: make(map[string]*types.Node)}
+	profile := types.Profile{RootNode: rootNode, Stack: []string{}}
 
-	file, err := os.Open(filename)
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(r)
 
 	state := fsm.NewFSM(
 		"start",
