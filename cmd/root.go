@@ -31,13 +31,14 @@ var memProfile string
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
-	Use:   "burn command [flags] <input>",
-	Short: "A tool to convert performance profiles to a JSON",
+	Use: "burn command [flags] <input>",
+	Short: `A tool to convert performance profiles to hierarchical data structures that 
+can be visualized as flame graphs`,
 	Long: `
-burn is a CLI tool to convert performance profiles to a JSON hierarchical
-data structures that can be consumed by the d3-flame-graph plugin.
+burn 🔥 is a CLI tool to convert performance profiles to hierarchical data
+structures that can be visualized as flame graphs.
 
-burn can also generate a fully contained HTML flame graph from the same data.
+burn can also generate a self contained html flame graphs from the same data.
 
 Examples:
   burn convert examples/out.perf

@@ -1,7 +1,7 @@
 ![burn](lizard.png)
 
 # burn
-burn is a CLI tool to convert performance profiles (perf_events, pprof, etc) to a JSON hierarchical data structure that can be consumed by [d3-flame-graph](https://github.com/spiermar/d3-flame-graph). burn can also generate a fully contained HTML flame graph from the same data.
+burn is a CLI tool to convert performance profiles (perf_events, pprof, etc) to hierarchical data structure that can be visualized as [flame graphs](http://www.brendangregg.com/flamegraphs.html), with the help of the [d3-flame-graph](https://github.com/spiermar/d3-flame-graph) plugin. burn can also generate a self contained html flame graphs from the same data.
 
 ## Getting Started
 
@@ -41,7 +41,8 @@ $ ./burn <input_file>
 ```
 $ burn convert --help
 
-Convert performance profiles to a hierarchical data structure.
+Convert a performance profile to a hierarchical data structure that
+can be visualized as a flame graph.
 
 Examples:
   burn convert examples/out.perf

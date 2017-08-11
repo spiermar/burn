@@ -31,10 +31,12 @@ var input string
 
 // convertCmd represents the convert command
 var convertCmd = &cobra.Command{
-	Use:   "convert [flags] (<input>)",
-	Short: "Convert performance profiles to a hierarchical data structure",
+	Use: "convert [flags] (<input>)",
+	Short: `Convert a performance profile to a hierarchical data structure that 
+can be visualized as a flame graph`,
 	Long: `
-Convert performance profiles to a hierarchical data structure.
+Convert a performance profile to a hierarchical data structure that 
+can be visualized as a flame graph.
 
 Examples:
   burn convert examples/out.perf
