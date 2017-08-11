@@ -45,7 +45,7 @@ Convert performance profiles to a hierarchical data structure.
 
 Examples:
   burn convert examples/out.perf
-  burn convert --folded examples/out.perf-folded
+  burn convert --type=folded examples/out.perf-folded
   burn convert --html examples/out.perf
   burn convert --output=flame.json examples/out.perf
   burn convert --html --output=flame.html examples/out.perf
@@ -55,11 +55,11 @@ Usage:
   burn convert [flags] (<input>)
 
 Flags:
-  -f, --folded          input is a folded stack
   -h, --help            help for convert
   -m, --html            output is a html flame graph
       --output string   output file
   -p, --pretty          json output is pretty printed
+      --type string     input type (default "perf")
 
 Global Flags:
       --config string       config file (default is $HOME/.burn.yaml)

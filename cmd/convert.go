@@ -42,6 +42,7 @@ Examples:
   burn convert --html examples/out.perf
   burn convert --output=flame.json examples/out.perf
   burn convert --html --output=flame.html examples/out.perf
+  perf script | burn convert --html
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		file := (*os.File)(nil)
