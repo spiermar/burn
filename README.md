@@ -5,7 +5,7 @@ burn is a CLI tool to convert performance profiles (perf_events, pprof, etc) to 
 
 ## Getting Started
 
-Just download _burn_ from the _golang_ source or binary and use it!
+Just download _burn_ from github using `go get` or the _pre-build_ binary and use it!
 
 ### From go
 
