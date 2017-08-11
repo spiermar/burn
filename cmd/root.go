@@ -27,6 +27,7 @@ import (
 
 var cfgFile string
 var cpuProfile string
+var memProfile string
 var foldedStack bool
 
 // RootCmd represents the base command when called without any subcommands
@@ -57,6 +58,14 @@ to quickly create a Cobra application.`,
 		if cpuProfile != "" {
 			pprof.StopCPUProfile()
 		}
+		if memProfile != "" {
+			f, err := os.Create(memProfile)
+			if err != nil {
+				log.Fatal(err)
+			}
+			pprof.WriteHeapProfile(f)
+			f.Close()
+		}
 	},
 }
 
@@ -77,6 +86,7 @@ func init() {
 	// will be global for your application.
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.stacko.yaml)")
 	RootCmd.PersistentFlags().StringVar(&cpuProfile, "cpuprofile", "", "Write CPU profile to file.")
+	RootCmd.PersistentFlags().StringVar(&memProfile, "memprofile", "", "Write heap profile to file.")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
