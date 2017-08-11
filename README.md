@@ -39,42 +39,24 @@ $ ./burn <perf_output_file>
 ```
 $ burn convert --help
 
-Convert a performance profile to a JSON.
+Convert performance profiles to a hierarchical data structure.
 
 Examples:
   burn convert examples/out.perf
   burn convert --folded examples/out.perf-folded
+  burn convert --html examples/out.perf
+  burn convert --output=flame.json examples/out.perf
+  burn convert --html --output=flame.html examples/out.perf
 
 Usage:
   burn convert [flags] <input>
 
 Flags:
-  -f, --folded   input is a folded stack
-  -h, --help     help for convert
-  -p, --pretty   json output is pretty printed
-
-Global Flags:
-      --config string       config file (default is $HOME/.burn.yaml)
-      --cpuprofile string   write CPU profile to file
-      --memprofile string   write heap profile to fil
-```
-
-```
-$ burn html --help
-
-Convert a performance profile to HTML flame graph.
-
-Examples:
-  burn html examples/out.perf
-  burn html --folded --output=flame.html examples/out.perf-folded
-
-Usage:
-  burn html [flags] <input>
-
-Flags:
   -f, --folded          input is a folded stack
-  -h, --help            help for html
+  -h, --help            help for convert
+  -m, --html            output is a html flame graph
       --output string   output file
+  -p, --pretty          json output is pretty printed
 
 Global Flags:
       --config string       config file (default is $HOME/.burn.yaml)

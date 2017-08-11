@@ -16,6 +16,8 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spiermar/burn/convert"
@@ -23,41 +25,72 @@ import (
 )
 
 var pretty bool
+var folded bool
+var html bool
+var output string
 
 // convertCmd represents the convert command
 var convertCmd = &cobra.Command{
 	Use:   "convert [flags] <input>",
-	Short: "Convert a performance profile to a JSON",
+	Short: "Convert performance profiles to a hierarchical data structure",
 	Long: `
-Convert a performance profile to a JSON.
+Convert performance profiles to a hierarchical data structure.
 
 Examples:
   burn convert examples/out.perf
   burn convert --folded examples/out.perf-folded
+  burn convert --html examples/out.perf
+  burn convert --output=flame.json examples/out.perf
+  burn convert --html --output=flame.html examples/out.perf
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
+		filePath := string(args[0])
+
 		rootNode := types.Node{"root", 0, make(map[string]*types.Node)}
 		profile := types.Profile{rootNode, []string{}}
 
-		if foldedStack {
-			profile = convert.ParseFolded(args[0])
+		if folded {
+			profile = convert.ParseFolded(filePath)
 		} else {
-			profile = convert.ParsePerf(args[0])
+			profile = convert.ParsePerf(filePath)
 		}
 
+		b := []byte{}
+
 		if pretty {
-			b, err := profile.RootNode.MarshalIndentJSON()
+			err := (error)(nil)
+			b, err = profile.RootNode.MarshalIndentJSON()
 			if err != nil {
 				panic(err)
 			}
-			fmt.Println(string(b))
 		} else {
-			b, err := profile.RootNode.MarshalJSON()
+			err := (error)(nil)
+			b, err = profile.RootNode.MarshalJSON()
 			if err != nil {
 				panic(err)
 			}
-			fmt.Println(string(b))
 		}
+
+		wr := os.Stdout
+
+		if output != "" {
+			err := (error)(nil)
+			wr, err = os.Create(output)
+			if err != nil {
+				panic(err)
+			}
+			defer wr.Close()
+		}
+
+		if html {
+			sep := strings.LastIndex(filePath, "/")
+			filename := filePath[sep+1:]
+			convert.GenerateHtml(wr, filename, string(b))
+		} else {
+			fmt.Fprintln(wr, string(b))
+		}
+
+		wr.Sync()
 	},
 }
 
@@ -69,8 +102,10 @@ func init() {
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	// convertCmd.PersistentFlags().String("foo", "", "A help for foo")
-	convertCmd.PersistentFlags().BoolVarP(&foldedStack, "folded", "f", false, "input is a folded stack")
+	convertCmd.PersistentFlags().BoolVarP(&folded, "folded", "f", false, "input is a folded stack")
 	convertCmd.PersistentFlags().BoolVarP(&pretty, "pretty", "p", false, "json output is pretty printed")
+	convertCmd.PersistentFlags().BoolVarP(&html, "html", "m", false, "output is a html flame graph")
+	convertCmd.PersistentFlags().StringVar(&output, "output", "", "output file")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:

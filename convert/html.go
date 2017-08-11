@@ -1,4 +1,4 @@
-// Copyright © 2017 NAME HERE <EMAIL ADDRESS>
+// Copyright © 2017 Martin Spier <spiermar@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,29 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cmd
+package convert
 
 import (
 	"html/template"
-	"os"
-	"strings"
-
-	"github.com/spf13/cobra"
-	"github.com/spiermar/burn/convert"
-	"github.com/spiermar/burn/types"
+	"io"
 )
 
-var output string
-
-const tpl = `<!DOCTYPE html>
+const flamegraphTpl = `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/spiermar/d3-flame-graph@1.0.1/dist/d3.flameGraph.min.css">
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/spiermar/d3-flame-graph@1.0.4/dist/d3.flameGraph.min.css">
 	<style>
     /* Space out content a bit */
     body {
@@ -96,25 +89,20 @@ const tpl = `<!DOCTYPE html>
     </div>
 
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.10.0/d3.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.7.1/d3-tip.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
-	<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/spiermar/d3-flame-graph@1.0.1/dist/d3.flameGraph.min.js"></script>
+  	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.7.1/d3-tip.min.js"></script>
+  	<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/spiermar/d3-flame-graph@1.0.4/dist/d3.flameGraph.min.js"></script>
 	<script type="text/javascript">
 		var data = {{.Stack}};
 	</script>
 	<script type="text/javascript">
     var flameGraph = d3.flameGraph()
-      .height(540)
       .width(960)
       .cellHeight(18)
       .transitionDuration(750)
       .transitionEase(d3.easeCubic)
       .sort(true)
-      //Example to sort in reverse order
-      //.sort(function(a,b){ return d3.descending(a.name, b.name);})
       .title("")
       .onClick(onClick);
-
 
     // Example on how to use custom tooltips using d3-tip.
     var tip = d3.tip()
@@ -124,13 +112,6 @@ const tpl = `<!DOCTYPE html>
       .html(function(d) { return "name: " + d.data.name + ", value: " + d.data.value; });
 
     flameGraph.tooltip(tip);
-
-    // Example on how to use custom labels
-    // var label = function(d) {
-    //  return "name: " + d.name + ", value: " + d.value;
-    // }
-
-    // flameGraph.label(label);
 
     d3.select("#chart")
       .datum(data)
@@ -162,81 +143,22 @@ const tpl = `<!DOCTYPE html>
   </body>
 </html>`
 
-// htmlCmd represents the html command
-var htmlCmd = &cobra.Command{
-	Use:   "html [flags] <input>",
-	Short: "Convert a performance profile to HTML flame graph",
-	Long: `
-Convert a performance profile to HTML flame graph.
+func GenerateHtml(wr io.Writer, name string, stack string) {
+	data := struct {
+		Name  string
+		Stack template.JS
+	}{
+		Name:  name,
+		Stack: template.JS(stack),
+	}
 
-Examples:
-  burn html examples/out.perf
-  burn html --folded --output=flame.html examples/out.perf-folded
-  `,
-	Run: func(cmd *cobra.Command, args []string) {
-		filename := string(args[0])
+	t, err := template.New("flamegraph").Parse(flamegraphTpl)
+	if err != nil {
+		panic(err)
+	}
 
-		rootNode := types.Node{"root", 0, make(map[string]*types.Node)}
-		profile := types.Profile{rootNode, []string{}}
-
-		if foldedStack {
-			profile = convert.ParseFolded(filename)
-		} else {
-			profile = convert.ParsePerf(filename)
-		}
-
-		b, err := profile.RootNode.MarshalJSON()
-		if err != nil {
-			panic(err)
-		}
-
-		t, err := template.New("flamegraph").Parse(tpl)
-		if err != nil {
-			panic(err)
-		}
-
-		sep := strings.LastIndex(filename, "/")
-
-		data := struct {
-			Name  string
-			Stack template.JS
-		}{
-			Name:  filename[sep+1:],
-			Stack: template.JS(b),
-		}
-
-		if output == "" {
-			output = filename + ".html"
-		}
-
-		f, err := os.Create(output)
-		if err != nil {
-			panic(err)
-		}
-
-		defer f.Close()
-
-		err = t.Execute(f, data)
-		if err != nil {
-			panic(err)
-		}
-
-		f.Sync()
-	},
-}
-
-func init() {
-	RootCmd.AddCommand(htmlCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// htmlCmd.PersistentFlags().String("foo", "", "A help for foo")
-	htmlCmd.PersistentFlags().BoolVarP(&foldedStack, "folded", "f", false, "input is a folded stack")
-	htmlCmd.PersistentFlags().StringVar(&output, "output", "", "output file")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// htmlCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	err = t.Execute(wr, data)
+	if err != nil {
+		panic(err)
+	}
 }
