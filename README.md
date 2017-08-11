@@ -84,7 +84,7 @@ Global Flags:
 
 Input and output examples can be found in the [examples](/examples) directory.
 
-## Building from Source
+## Building from source
 
 Make sure you have [golang](https://golang.org/) installed and `GOPATH` correctly set.
 
