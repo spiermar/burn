@@ -37,6 +37,7 @@ func ParsePerf(r io.Reader) types.Profile {
 			{Name: "open_stack", Src: []string{"start"}, Dst: "event"},
 			{Name: "open_stack", Src: []string{"comment"}, Dst: "event"},
 			{Name: "read_stack", Src: []string{"event"}, Dst: "open"},
+			{Name: "close_stack", Src: []string{"event"}, Dst: "closed"},
 			{Name: "close_stack", Src: []string{"open"}, Dst: "closed"},
 			{Name: "open_stack", Src: []string{"closed"}, Dst: "event"},
 			{Name: "finish", Src: []string{"closed"}, Dst: "end"},
@@ -82,7 +83,7 @@ func ParsePerf(r io.Reader) types.Profile {
 			}
 		case "comment":
 			if reCommentLine.MatchString(line) {
-				// Do nothing
+				// do nothing
 			} else if matches := reEventRecordStartLine.FindStringSubmatch(line); matches != nil {
 				err := state.Event("open_stack")
 				if err != nil {
@@ -100,6 +101,12 @@ func ParsePerf(r io.Reader) types.Profile {
 					panic(err)
 				}
 				profile.AddFrame(matches[2])
+			} else if reEndStackLine.MatchString(line) { // empty stack
+				err := state.Event("close_stack")
+				if err != nil {
+					panic(err)
+				}
+				profile.CloseStack()
 			} else {
 				panic("Invalid format.")
 			}
