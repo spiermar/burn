@@ -79,7 +79,7 @@ Examples:
 		if input == "folded" {
 			profile = convert.ParseFolded(file)
 		} else if input == "perf" {
-			profile = convert.ParsePerf(file)
+			profile = convert.ParsePerf(cmd.Context(), file)
 		} else {
 			panic("input type not supported: " + input)
 		}
