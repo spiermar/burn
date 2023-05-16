@@ -5,35 +5,12 @@ burn is a CLI tool to convert performance profiles (perf_events, pprof, etc) to 
 
 ## Getting Started
 
-Just download _burn_ from github using `go get` or the _pre-build_ binary and use it!
-
-### From go
-
-Make sure you have [golang](https://golang.org/) installed and `GOPATH` correctly set.
+Make sure you have [golang](https://go.dev) installed.
 
 ```bash
-$ go get github.com/spiermar/burn
-$ burn $GOPATH/src/github.com/spiermar/burn/examples/out.perf
-```
-
-### From binary
-
-Binaries are being provided for both `linux` and `darwin`, in `amd64` arch.
-
-#### darwin/amd64
-
-```bash
-$ curl -L "https://dl.bintray.com/mspier/binaries/burn/1.0.1/darwin/amd64/burn" -o burn
-$ chmod +x burn
-$ ./burn <input_file>
-```
-
-#### linux/amd64
-
-```bash
-$ curl -L "https://dl.bintray.com/mspier/binaries/burn/1.0.1/linux/amd64/burn" -o burn
-$ chmod +x burn
-$ ./burn <input_file>
+$ go install github.com/spiermar/burn@latest
+$ curl https://raw.githubusercontent.com/spiermar/burn/master/examples/out.perf >out.perf
+$ burn convert out.perf
 ```
 
 ## Options
@@ -74,11 +51,11 @@ Input and output examples can be found in the [examples](/examples) directory.
 
 ## Building from source
 
-Make sure you have [golang](https://golang.org/) installed and `GOPATH` correctly set.
+Make sure you have [golang](https://go.dev) installed.
 
 ```bash
-$ go get github.com/spiermar/burn
-$ cd $GOPATH/src/github.com/spiermar/burn
+$ git clone https://github.com/spiermar/burn
+$ cd burn
 $ go build
 $ ./burn examples/out.perf
 ```
